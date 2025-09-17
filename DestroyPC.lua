@@ -100,37 +100,45 @@ uis.InputBegan:Connect(function(input, gp)
 	end
 end)
 
-local ContextActionService = game:GetService("ContextActionService")
-
--- Функция для создания кнопки
-local function createMobileButton(name, keycode, touchText, callback)
-    ContextActionService:BindAction(
-        name,
-        function(_, inputState)
-            if inputState == Enum.UserInputState.Begin then
-                callback()
+-- Мобильные кнопки
+if uis.TouchEnabled then -- Проверяем, что устройство поддерживает touch
+    local ContextActionService = game:GetService("ContextActionService")
+    local ScreenGui = Instance.new("ScreenGui")
+    local Frame = Instance.new("Frame")
+    
+    ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+    ScreenGui.Name = "MobileButtons"
+    
+    Frame.Parent = ScreenGui
+    Frame.Size = UDim2.new(1, 0, 0.15, 0)
+    Frame.Position = UDim2.new(0, 0, 0.85, 0)
+    Frame.BackgroundTransparency = 1
+    Frame.Name = "ButtonContainer"
+    
+    local buttons = {
+        {name = "ToggleESP", text = "ESP", key = "X", callback = toggleESP},
+        {name = "TPSpam", text = "TP", key = "C", callback = function() tpSpamming = not tpSpamming end},
+        {name = "SpeedHack", text = "Speed", key = "B", callback = function() speedEnabled = not speedEnabled end},
+        {name = "DashForward", text = "Dash", key = "G", callback = function()
+            local hrp = lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")
+            if hrp then
+                hrp.CFrame = hrp.CFrame + hrp.CFrame.LookVector * 25
             end
-        end,
-        true, -- создаёт кнопку на мобилке
-        keycode
-    )
-    ContextActionService:SetTitle(name, touchText)
-    ContextActionService:SetPosition(name, UDim2.new(0.1, 0, 0.8, 0)) -- позиция на экране
+        end}
+    }
+    
+    for i, buttonInfo in ipairs(buttons) do
+        local button = Instance.new("TextButton")
+        button.Name = buttonInfo.name
+        button.Size = UDim2.new(0.2, 0, 0.8, 0)
+        button.Position = UDim2.new(0.2 * (i-1) + 0.1, 0, 0.1, 0)
+        button.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+        button.TextColor3 = Color3.fromRGB(255, 255, 255)
+        button.Text = buttonInfo.text
+        button.Font = Enum.Font.SourceSansBold
+        button.TextScaled = true
+        button.Parent = Frame
+        
+        button.MouseButton1Click:Connect(buttonInfo.callback)
+    end
 end
-
--- Пример использования:
-createMobileButton("ToggleESP", Enum.KeyCode.X, "ESP", function()
-    print("ESP toggled") -- тут вызовешь toggleESP()
-end)
-
-createMobileButton("TPSpam", Enum.KeyCode.C, "TP", function()
-    print("TP spam toggled")
-end)
-
-createMobileButton("SpeedHack", Enum.KeyCode.B, "Speed", function()
-    print("Speed toggled")
-end)
-
-createMobileButton("DashForward", Enum.KeyCode.G, "Dash", function()
-    print("Dash forward")
-end)
