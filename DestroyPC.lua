@@ -99,3 +99,38 @@ uis.InputBegan:Connect(function(input, gp)
 		end
 	end
 end)
+
+local ContextActionService = game:GetService("ContextActionService")
+
+-- Функция для создания кнопки
+local function createMobileButton(name, keycode, touchText, callback)
+    ContextActionService:BindAction(
+        name,
+        function(_, inputState)
+            if inputState == Enum.UserInputState.Begin then
+                callback()
+            end
+        end,
+        true, -- создаёт кнопку на мобилке
+        keycode
+    )
+    ContextActionService:SetTitle(name, touchText)
+    ContextActionService:SetPosition(name, UDim2.new(0.1, 0, 0.8, 0)) -- позиция на экране
+end
+
+-- Пример использования:
+createMobileButton("ToggleESP", Enum.KeyCode.X, "ESP", function()
+    print("ESP toggled") -- тут вызовешь toggleESP()
+end)
+
+createMobileButton("TPSpam", Enum.KeyCode.C, "TP", function()
+    print("TP spam toggled")
+end)
+
+createMobileButton("SpeedHack", Enum.KeyCode.B, "Speed", function()
+    print("Speed toggled")
+end)
+
+createMobileButton("DashForward", Enum.KeyCode.G, "Dash", function()
+    print("Dash forward")
+end)
